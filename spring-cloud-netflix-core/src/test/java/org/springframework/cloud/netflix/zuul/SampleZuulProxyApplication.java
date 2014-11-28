@@ -3,6 +3,8 @@ package org.springframework.cloud.netflix.zuul;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.zuul.sample.SampleZuulFilter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +33,11 @@ public class SampleZuulProxyApplication {
     @RequestMapping(value="/local/self/{id}", method=RequestMethod.GET)
     public String get() {
         return "Gotten!";
+    }
+
+    @Bean
+    public SampleZuulFilter filter() {
+        return new SampleZuulFilter();
     }
 
 	@RequestMapping("/")

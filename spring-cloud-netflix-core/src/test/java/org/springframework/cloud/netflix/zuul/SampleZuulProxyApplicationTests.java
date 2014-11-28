@@ -1,7 +1,9 @@
 package org.springframework.cloud.netflix.zuul;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import com.netflix.zuul.ZuulFilter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SampleZuulProxyApplication.class)
@@ -31,6 +36,9 @@ public class SampleZuulProxyApplicationTests {
 	@Autowired
 	private ZuulHandlerMapping mapping;
 
+	@Autowired
+	private ZuulConfiguration configuration;
+
 	@Test
 	public void deleteOnSelfViaSimpleHostRoutingFilter() {
 		routes.getRoutes().put("/self/**", "http://localhost:" + port + "/local");
@@ -38,6 +46,12 @@ public class SampleZuulProxyApplicationTests {
 		ResponseEntity<String> result = new TestRestTemplate().exchange("http://localhost:" + port + "/self/1",
 				HttpMethod.DELETE, new HttpEntity<Void>((Void) null), String.class);
 		assertEquals(HttpStatus.OK, result.getStatusCode());
+	}
+
+	@Test
+	public void registerCustomFilters() {
+		Map<String, ZuulFilter> filters = (Map<String, ZuulFilter>) ReflectionTestUtils.getField(configuration, "filters");
+		assertTrue("Filters should be > 1", filters.size() > 1);
 	}
 
 }
